@@ -34,7 +34,7 @@ export default function ExpensiveToServeTable() {
                 <th>Classification</th>
                 <th>Infra % Revenue</th>
                 <th
-                  title="The vertical's median Infra Cost % Revenue — the peer benchmark this row is compared against."
+                  title="The vertical median Infra Cost % of Revenue used as the benchmark for this row"
                   style={{ cursor: 'help', textDecoration: 'underline dotted' }}
                 >
                   Vertical Median
@@ -48,10 +48,10 @@ export default function ExpensiveToServeTable() {
                   <td>{r.name}</td>
                   <td>{r.vertical}</td>
                   <td>{CLASSIFICATION_LABEL[r.classification]}</td>
-                  <td>{r.infraPctRevenue == null ? '—' : pct(r.infraPctRevenue)}</td>
-                  <td>{r.infraVerticalMedian == null ? '—' : pct(r.infraVerticalMedian)}</td>
+                  <td>{r.infraPctRevenue == null ? '-' : pct(r.infraPctRevenue)}</td>
+                  <td>{r.infraVerticalMedian == null ? '-' : pct(r.infraVerticalMedian)}</td>
                   <td>
-                    <b>{r.infraIndex == null ? '—' : `${r.infraIndex.toFixed(1)}×`}</b>
+                    <b>{r.infraIndex == null ? '-' : `${r.infraIndex.toFixed(1)}×`}</b>
                   </td>
                 </tr>
               ))}
