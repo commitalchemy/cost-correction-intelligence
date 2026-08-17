@@ -31,6 +31,8 @@ export default function KpiRow() {
     (r) => r.classification !== 'no-utility' && (r.puucDeviation == null || r.errDeviation == null)
   );
 
+  const expensiveToServeCount = rows.filter((r) => r.expensiveToServe).length;
+
   return (
     <>
       <section className="kpis">
@@ -47,6 +49,14 @@ export default function KpiRow() {
             <div className="kpi-sub">{c.sub}</div>
           </div>
         ))}
+        <div
+          className="kpi undetermined"
+          title="Infra Cost % Revenue more than 2x the vertical median — a separate lens, not part of Cost/Effort classification."
+        >
+          <div className="label">Expensive to Serve</div>
+          <div className="value">{expensiveToServeCount.toLocaleString()}</div>
+          <div className="kpi-sub">Infra Cost outlier</div>
+        </div>
       </section>
       {missingBenchmark && (
         <div className="benchmark-warning">Some institutions have insufficient Cost or Operational Effort benchmark data.</div>

@@ -83,6 +83,9 @@ export function canonicalize(rows: RawRecord[]): RawRow[] {
     // PUUC numerator — Core Invoicing FY'26, NOT Core Collections
     coreInvoicing: findColumn(headers, ["Core Invoicing FY'26", 'Core Invoicing FY26', 'Core Invoicing']),
 
+    // Expensive to Serve lens input — kept separate from the PUUC numerator above
+    infraCost: findColumn(headers, ['Infra Cost', 'Infrastructure Cost']),
+
     // ERR raw inputs
     tickets: findColumn(headers, ['Ticket Count', 'Tickets']),
     avgResTime: findColumn(headers, ['Avg Resolution Time in Business Hours', 'Avg Resolution Time (Business Hours)', 'Average Resolution Time Business Hours']),
@@ -128,6 +131,7 @@ export function canonicalize(rows: RawRecord[]): RawRow[] {
         aiVoice: numberOrZero(k.aiVoice ? r[k.aiVoice] : null),
       },
       coreInvoicingFY26: numberValue(k.coreInvoicing ? r[k.coreInvoicing] : null),
+      infraCost: numberValue(k.infraCost ? r[k.infraCost] : null),
       ticketCount: numberValue(k.tickets ? r[k.tickets] : null),
       avgResolutionTimeHours: numberValue(k.avgResTime ? r[k.avgResTime] : null),
       annualTicketEfforts: numberValue(k.annualTicketEfforts ? r[k.annualTicketEfforts] : null),

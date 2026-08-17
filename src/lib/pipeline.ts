@@ -1,6 +1,7 @@
 import { canonicalize, type RawRecord } from './canonicalize';
 import { applyBenchmarks } from './benchmark';
 import { classifyRows } from './quadrant';
+import { attachExpensiveToServe } from './expensiveToServe';
 import type { Row } from '../types';
 
 /**
@@ -16,5 +17,6 @@ import type { Row } from '../types';
 export function buildRows(raw: RawRecord[]): Row[] {
   const canon = canonicalize(raw);
   const benchmarked = applyBenchmarks(canon);
-  return classifyRows(benchmarked);
+  const classified = classifyRows(benchmarked);
+  return attachExpensiveToServe(classified);
 }

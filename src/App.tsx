@@ -14,6 +14,8 @@ import QuadrantMatrix from './components/charts/QuadrantMatrix';
 import PriorityChart from './components/charts/PriorityChart';
 import ActionTable from './components/table/ActionTable';
 import InstitutionTable from './components/table/InstitutionTable';
+import ExpensiveToServeChart from './components/charts/ExpensiveToServeChart';
+import ExpensiveToServeTable from './components/table/ExpensiveToServeTable';
 import DrawerPanel from './components/drilldown/DrawerPanel';
 
 export default function App() {
@@ -55,6 +57,9 @@ export default function App() {
             <ErrComparisonChart />
             <QuadrantMatrix />
           </div>
+
+          <ExpensiveToServeChart />
+          <ExpensiveToServeTable />
 
           <InstitutionTable />
         </div>
