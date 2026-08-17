@@ -18,20 +18,27 @@ export default function KpiRow() {
   };
   rows.forEach((r) => counts[r.classification]++);
 
-  const cards: { key: AccountPanelCategory; cls: string; label: string; value: number; sub: string }[] = [
+  const expensiveToServeCount = rows.filter((r) => r.expensiveToServe).length;
+
+  const cards: { key: AccountPanelCategory; cls: string; label: string; value: number; sub: string; title?: string }[] = [
     { key: 'both-high', cls: 'both', label: CLASSIFICATION_LABEL['both-high'], value: counts['both-high'], sub: 'Cost and effort' },
     { key: 'cost-only', cls: 'cost', label: CLASSIFICATION_LABEL['cost-only'], value: counts['cost-only'], sub: 'Above benchmark' },
     { key: 'effort-only', cls: 'effort', label: CLASSIFICATION_LABEL['effort-only'], value: counts['effort-only'], sub: 'Elevated effort' },
     { key: 'healthy', cls: 'healthy', label: CLASSIFICATION_LABEL.healthy, value: counts.healthy, sub: 'Within benchmark' },
-    { key: 'no-utility', cls: 'undetermined', label: CLASSIFICATION_LABEL['no-utility'], value: counts['no-utility'], sub: 'No usage signal' },
+    {
+      key: 'expensive-to-serve',
+      cls: 'expensive',
+      label: 'Expensive to Serve',
+      value: expensiveToServeCount,
+      sub: 'Infra Cost outlier',
+      title: 'Infra Cost % Revenue more than 2x the vertical median — a separate lens, not part of Cost/Effort classification.',
+    },
     { key: 'total', cls: 'total', label: 'Total', value: rows.length, sub: 'In current view' },
   ];
 
   const missingBenchmark = rows.some(
     (r) => r.classification !== 'no-utility' && (r.puucDeviation == null || r.errDeviation == null)
   );
-
-  const expensiveToServeCount = rows.filter((r) => r.expensiveToServe).length;
 
   return (
     <>
@@ -43,20 +50,13 @@ export default function KpiRow() {
             onClick={() => openAccountPanel({ category: c.key, title: c.label })}
             role="button"
             tabIndex={0}
+            title={c.title}
           >
             <div className="label">{c.label}</div>
             <div className="value">{c.value.toLocaleString()}</div>
             <div className="kpi-sub">{c.sub}</div>
           </div>
         ))}
-        <div
-          className="kpi undetermined"
-          title="Infra Cost % Revenue more than 2x the vertical median — a separate lens, not part of Cost/Effort classification."
-        >
-          <div className="label">Expensive to Serve</div>
-          <div className="value">{expensiveToServeCount.toLocaleString()}</div>
-          <div className="kpi-sub">Infra Cost outlier</div>
-        </div>
       </section>
       {missingBenchmark && (
         <div className="benchmark-warning">Some institutions have insufficient Cost or Operational Effort benchmark data.</div>

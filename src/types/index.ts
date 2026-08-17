@@ -70,7 +70,10 @@ export interface Row extends RawRow {
   classification: Classification;
 
   // Expensive to Serve — separate lens, attached after classification.
-  // Never read by benchmark.ts or quadrant.ts.
+  // Never read by benchmark.ts or quadrant.ts. Optional because
+  // applyBenchmarks() in benchmark.ts constructs Row objects before this
+  // lens runs — attachExpensiveToServe() in expensiveToServe.ts always
+  // fills these in afterward.
   infraPctRevenue?: number | null;
   infraVerticalMedian?: number | null;
   infraIndex?: number | null;

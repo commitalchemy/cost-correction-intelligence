@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Row, ScoredRow, FilterState, DeviationBand, Classification } from '../types';
 
-export type AccountPanelCategory = Classification | 'total';
+export type AccountPanelCategory = Classification | 'total' | 'expensive-to-serve';
 
 interface AccountPanelState {
   category: AccountPanelCategory;

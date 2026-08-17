@@ -12,7 +12,12 @@ export default function AccountPanel() {
 
   if (!panel) return null;
 
-  const list = panel.category === 'total' ? rows : rows.filter((r) => r.classification === panel.category);
+  const list =
+    panel.category === 'total'
+      ? rows
+      : panel.category === 'expensive-to-serve'
+        ? rows.filter((r) => r.expensiveToServe)
+        : rows.filter((r) => r.classification === panel.category);
   const visible = list.slice(0, VISIBLE_LIMIT);
 
   return (

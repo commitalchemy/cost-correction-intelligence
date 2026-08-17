@@ -12,12 +12,24 @@ const layout = (extra: Record<string, any> = {}) => ({
   ...extra,
 });
 
+// Both axes can carry a handful of extreme outliers (near-zero benchmark
+// denominators) that stretch the view into the thousands of percent/times
+// and make the rest of the population unreadable. The view is zoomed to the
+// range that holds the vast majority of institutions; outliers still exist
+// in the data, table, and drilldown, just not in this chart's view.
+const X_VIEW_MIN = -1; // -100% PUUC deviation
+const X_VIEW_MAX = 3; // +300% PUUC deviation
+const Y_VIEW_MAX = 10; // 10x vertical median Infra Cost share
+
 export default function ExpensiveToServeChart() {
   const rows = useFilteredRows();
   const openDrawer = useFilterStore((s) => s.openDrawer);
   const usable = rows.filter((r) => r.infraIndex != null && r.puucDeviation != null);
   const flagged = usable.filter((r) => r.expensiveToServe);
   const rest = usable.filter((r) => !r.expensiveToServe);
+  const hiddenOutliers = usable.filter(
+    (r) => r.puucDeviation! < X_VIEW_MIN || r.puucDeviation! > X_VIEW_MAX || r.infraIndex! > Y_VIEW_MAX
+  ).length;
 
   const traces = [
     {
@@ -47,6 +59,13 @@ export default function ExpensiveToServeChart() {
         Infra Cost Index (Infra Cost % Revenue ÷ vertical median) vs PUUC deviation. Points above the dotted line cost{' '}
         {EXPENSIVE_TO_SERVE_MULTIPLIER}× their vertical's typical Infra Cost share, independent of Cost/Effort classification.
         Click a point for detail.
+        {hiddenOutliers > 0 && (
+          <>
+            {' '}
+            View zoomed to −100%–300% deviation and up to 10× Infra Index; {hiddenOutliers.toLocaleString()} extreme outlier
+            {hiddenOutliers === 1 ? '' : 's'} outside this range (still included in the table and all counts).
+          </>
+        )}
       </div>
       <div className="chart">
         {usable.length === 0 ? (
@@ -55,8 +74,20 @@ export default function ExpensiveToServeChart() {
           <Plot
             data={traces as any}
             layout={layout({
-              xaxis: { title: 'PUUC deviation vs vertical median', tickformat: '.0%', zeroline: true, gridcolor: '#EFE9DC' },
-              yaxis: { title: 'Infra Cost Index (× vertical median)', gridcolor: '#EFE9DC' },
+              xaxis: {
+                title: 'PUUC deviation vs vertical median',
+                tickformat: '.0%',
+                zeroline: true,
+                gridcolor: '#EFE9DC',
+                range: [X_VIEW_MIN, X_VIEW_MAX],
+                autorange: false,
+              },
+              yaxis: {
+                title: 'Infra Cost Index (× vertical median)',
+                gridcolor: '#EFE9DC',
+                range: [0, Y_VIEW_MAX],
+                autorange: false,
+              },
               shapes: [
                 {
                   type: 'line',

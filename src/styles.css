@@ -86,9 +86,8 @@ h1{margin:8px 0 6px;font-size:32px;font-weight:600;letter-spacing:-.02em}
 .kpi.both{--accent:var(--danger)} .kpi.both .value{color:var(--danger)}
 .kpi.healthy{--accent:var(--good)} .kpi.healthy .value{color:var(--good)}
 .kpi.undetermined{--accent:var(--muted-2)}
-.kpi.total{--accent:var(--orange);background:var(--navy);border-color:var(--navy)}
-.kpi.total .label,.kpi.total .kpi-sub{color:rgba(255,255,255,.62)}
-.kpi.total .value{color:#fff}
+.kpi.expensive{--accent:var(--danger)} .kpi.expensive .value{color:var(--danger)}
+.kpi.total{--accent:var(--navy)}
 
 @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.kpis{grid-template-columns:1fr}}
