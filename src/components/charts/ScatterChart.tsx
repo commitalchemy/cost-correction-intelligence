@@ -18,11 +18,20 @@ const layout = (extra: Record<string, any> = {}) => ({
   ...extra,
 });
 
+// Deviation is technically valid but can run into the thousands of percent
+// for a handful of outliers (e.g. near-zero benchmark denominators), which
+// stretches the axis and makes the rest of the population unreadable. The
+// view is zoomed to the range that holds the vast majority of institutions;
+// outliers still exist in the data and drilldown, just not in this view.
+const X_VIEW_MIN = -1; // -100%
+const X_VIEW_MAX = 3; // +300%
+
 export default function ScatterChart() {
   const rows = useFilteredRows();
   const openDrawer = useFilterStore((s) => s.openDrawer);
   const usable = rows.filter((r) => r.puucDeviation != null && r.puuc != null);
   const present = ORDER.filter((c) => usable.some((r) => r.classification === c));
+  const hiddenOutliers = usable.filter((r) => r.puucDeviation! < X_VIEW_MIN || r.puucDeviation! > X_VIEW_MAX).length;
 
   const traces = present.map((c, i) => {
     const z = usable.filter((r) => r.classification === c);
@@ -40,7 +49,12 @@ export default function ScatterChart() {
   return (
     <section className="panel">
       <h2>Cost Distribution</h2>
-      <div className="desc">PUUC against recalculated PUUC deviation. Click a point for institution detail.</div>
+      <div className="desc">
+        PUUC against recalculated PUUC deviation. Click a point for institution detail.
+        {hiddenOutliers > 0 && (
+          <> View zoomed to −100%–300% deviation; {hiddenOutliers.toLocaleString()} extreme outlier{hiddenOutliers === 1 ? '' : 's'} outside this range (still included in all counts, tables, and totals).</>
+        )}
+      </div>
       <div className="chart">
         {usable.length === 0 ? (
           <div className="chart-empty">No institutions with a usable PUUC in the current view.</div>
@@ -48,7 +62,14 @@ export default function ScatterChart() {
           <Plot
             data={traces as any}
             layout={layout({
-              xaxis: { title: 'PUUC deviation vs vertical median', tickformat: '.0%', zeroline: true, gridcolor: '#EFE9DC' },
+              xaxis: {
+                title: 'PUUC deviation vs vertical median',
+                tickformat: '.0%',
+                zeroline: true,
+                gridcolor: '#EFE9DC',
+                range: [X_VIEW_MIN, X_VIEW_MAX],
+                autorange: false,
+              },
               yaxis: { title: 'PUUC (₹)', gridcolor: '#EFE9DC' },
               legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.16, yanchor: 'bottom', font: { size: 10 } },
               showlegend: true,

@@ -68,15 +68,21 @@ export default function DrawerPanel() {
 
         <div className="subhead">Total Correction Opportunity (vs. benchmark)</div>
         {[
-          ['Eligible for benchmark', row.utilityCount != null && row.utilityCount >= CORRECTION_UTILITY_FLOOR ? 'Yes' : `No — Utility Count below ${CORRECTION_UTILITY_FLOOR}`],
-          ['Vertical benchmark', correction.hasBenchmark ? 'Valid (3+ comparable peers)' : 'Insufficient Peer Benchmark'],
-          ['Ideal Commercial Value', money(correction.ideal)],
-          ['Actual Collections (Core Invoicing)', money(row.coreInvoicingFY26)],
-          ['Revenue Gap (₹)', money(correction.gap)],
-          ['Correction Opportunity %', correction.pctOfIdeal == null ? '—' : `${correction.pctOfIdeal.toFixed(1)}%`],
-        ].map(([label, value]) => (
+          ['Eligible for benchmark', row.utilityCount != null && row.utilityCount >= CORRECTION_UTILITY_FLOOR ? 'Yes' : `No — Utility Count below ${CORRECTION_UTILITY_FLOOR}`, undefined],
+          ['Vertical benchmark', correction.hasBenchmark ? 'Valid (3+ comparable peers)' : 'Insufficient Peer Benchmark', undefined],
+          ['Ideal Commercial Value', money(correction.ideal), undefined],
+          ['Actual Collections (Core Invoicing)', money(row.coreInvoicingFY26), undefined],
+          ['Revenue Gap (₹)', money(correction.gap), undefined],
+          [
+            'Correction Opportunity %',
+            correction.pctOfIdeal == null ? '—' : `${correction.pctOfIdeal.toFixed(1)}%`,
+            "Share of this institution's ideal commercial value (Utility Count × vertical benchmark PUUC) that is currently uncollected. Higher % = larger gap between actual and benchmark-implied collections.",
+          ],
+        ].map(([label, value, tip]) => (
           <div className="metric" key={label as string}>
-            <span>{label}</span>
+            <span title={tip as string | undefined} style={tip ? { cursor: 'help', textDecoration: 'underline dotted' } : undefined}>
+              {label}
+            </span>
             <b>{String(value)}</b>
           </div>
         ))}

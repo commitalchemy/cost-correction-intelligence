@@ -37,7 +37,12 @@ export default function ActionTable() {
                 <th>Institution</th>
                 <th>Vertical</th>
                 <th>Utility Count</th>
-                <th>Correction Opportunity %</th>
+                <th
+                  title="How much of this institution's ideal commercial value (Utility Count × vertical benchmark PUUC) is currently uncollected. E.g. 40% means actual collections are 40% below what the vertical benchmark implies they should be."
+                  style={{ cursor: 'help', textDecoration: 'underline dotted' }}
+                >
+                  Correction Opportunity %
+                </th>
               </tr>
             </thead>
             <tbody>
