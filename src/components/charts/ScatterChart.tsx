@@ -31,10 +31,11 @@ export default function ScatterChart() {
   const openDrawer = useFilterStore((s) => s.openDrawer);
   const usable = rows.filter((r) => r.puucDeviation != null && r.puuc != null);
   const present = ORDER.filter((c) => usable.some((r) => r.classification === c));
-  const hiddenOutliers = usable.filter((r) => r.puucDeviation! < X_VIEW_MIN || r.puucDeviation! > X_VIEW_MAX).length;
 
   const traces = present.map((c, i) => {
-    const z = usable.filter((r) => r.classification === c);
+    const z = usable.filter(
+      (r) => r.classification === c && r.puucDeviation! >= X_VIEW_MIN && r.puucDeviation! <= X_VIEW_MAX && r.puuc! > 0
+   );
     return {
       x: z.map((r) => r.puucDeviation),
       y: z.map((r) => r.puuc),
@@ -42,18 +43,15 @@ export default function ScatterChart() {
       customdata: z,
       mode: 'markers' as const,
       name: CLASSIFICATION_LABEL[c],
-      marker: { size: 8, color: COLORS[i % COLORS.length], opacity: 0.78, line: { width: 1, color: '#fff' } },
+      marker: { size: 6, color: COLORS[i % COLORS.length], opacity: 0.55, line: { width: 0.5, color: '#fff' } },
     };
   });
 
   return (
     <section className="panel">
-      <h2>Cost Distribution</h2>
+      <h2>Cost vs. Effort Distribution</h2>
       <div className="desc">
         PUUC against recalculated PUUC deviation. Click a point for institution detail.
-        {hiddenOutliers > 0 && (
-          <> View zoomed to −100%–300% deviation; {hiddenOutliers.toLocaleString()} extreme outlier{hiddenOutliers === 1 ? '' : 's'} outside this range (still included in all counts, tables, and totals).</>
-        )}
       </div>
       <div className="chart">
         {usable.length === 0 ? (
@@ -66,11 +64,17 @@ export default function ScatterChart() {
                 title: 'PUUC deviation vs vertical median',
                 tickformat: '.0%',
                 zeroline: true,
+                zerolinewidth: 2,
+                zerolinecolor: '#5c5648',
                 gridcolor: '#EFE9DC',
                 range: [X_VIEW_MIN, X_VIEW_MAX],
                 autorange: false,
               },
-              yaxis: { title: 'PUUC (₹)', gridcolor: '#EFE9DC' },
+              yaxis: {
+                title: 'PUUC (₹, log scale)',
+                type: 'log',
+                gridcolor: '#EFE9DC',
+              },
               legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.16, yanchor: 'bottom', font: { size: 10 } },
               showlegend: true,
             })}
