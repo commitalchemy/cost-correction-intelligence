@@ -63,9 +63,6 @@ export default function QuadrantMatrix() {
         </div>
       </div>
       <div className="quadrant-footer">
-        <span>
-          {(counts['no-utility'] + counts.undetermined).toLocaleString()} institutions excluded from the matrix (no usage signal or insufficient benchmark data)
-        </span>
         {classification !== 'All' && <button onClick={() => setClassification('All')}>Clear</button>}
       </div>
     </section>
