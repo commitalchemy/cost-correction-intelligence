@@ -13,12 +13,12 @@ export const CLASSIFICATION_LABEL: Record<Classification, string> = {
 };
 
 export const CLASSIFICATION_DESC: Record<Classification, string> = {
-  'cost-only': 'PUUC deviation above +20% of vertical median; effort is not elevated',
-  'effort-only': 'ERR deviation below -20% of vertical median; cost is not elevated',
+  'cost-only': 'PUUC deviation above +20% of vertical median; effort is not elevated (or not evaluable)',
+  'effort-only': 'ERR deviation below -20% of vertical median; cost is not elevated (or not evaluable)',
   'both-high': 'Both cost and effort deviations breach threshold',
-  healthy: 'Neither cost nor effort is elevated',
+  healthy: 'Neither cost nor effort is elevated, of whichever dimensions could be evaluated',
   'no-utility': 'Utility Count is zero or invalid — no basis for PUUC/ERR',
-  undetermined: 'Utility exists but required benchmark data is insufficient',
+  undetermined: 'Utility exists but neither Cost nor Effort benchmark data is available',
 };
 
 /** Cost is high when PUUC Deviation > +20%. Null (unknown) when deviation can't be computed. */
@@ -41,23 +41,36 @@ export function isEffortHigh(row: Pick<Row, 'errDeviation'>): boolean | null {
  * status across the whole app. Never derived from the pasted spreadsheet
  * status column.
  *
+ * Cost and Effort are INDEPENDENT dimensions — each is evaluated whenever
+ * its own benchmark data (PUUC / PUUC vertical median, ERR / ERR vertical
+ * median) is available, regardless of whether the other dimension's data
+ * exists. A missing benchmark on ONE side is never a reason to fall back
+ * to Undetermined; the institution is classified from whichever dimension
+ * IS available.
+ *
  *   No Utility     Utility Count <= 0
- *   Undetermined   Valid utility exists, but cost/effort deviation is unavailable
- *   Both High      Cost High AND Effort High
- *   Cost Only      Cost High AND NOT Effort High
- *   Effort Only    Effort High AND NOT Cost High
- *   Healthy        Neither Cost High nor Effort High
+ *   Both High      Cost High AND Effort High                 (both evaluable)
+ *   Cost Only      Cost High, and (Effort not high OR Effort not evaluable)
+ *   Effort Only    Effort High, and (Cost not high OR Cost not evaluable)
+ *   Healthy        Neither is high, among whichever dimension(s) are evaluable
+ *   Undetermined   Utility exists, but NEITHER Cost NOR Effort is evaluable
  */
 export function classify(row: Pick<Row, 'utilityCount' | 'puucDeviation' | 'errDeviation'>): Classification {
   if (row.utilityCount == null || row.utilityCount <= 0) return 'no-utility';
 
-  const cost = isCostHigh(row);
-  const effort = isEffortHigh(row);
-  if (cost == null || effort == null) return 'undetermined';
+  const cost = isCostHigh(row); // true / false / null (unavailable)
+  const effort = isEffortHigh(row); // true / false / null (unavailable)
 
-  if (cost && effort) return 'both-high';
-  if (cost) return 'cost-only';
-  if (effort) return 'effort-only';
+  if (cost == null && effort == null) return 'undetermined';
+
+  // Whichever side is unavailable is simply treated as "not high" — the
+  // classification is driven entirely by the dimension(s) that ARE known.
+  const costHigh = cost === true;
+  const effortHigh = effort === true;
+
+  if (costHigh && effortHigh) return 'both-high';
+  if (costHigh) return 'cost-only';
+  if (effortHigh) return 'effort-only';
   return 'healthy';
 }
 

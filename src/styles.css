@@ -73,8 +73,8 @@ h1{margin:8px 0 6px;font-size:32px;font-weight:600;letter-spacing:-.02em}
 .error{margin-top:14px;padding:14px 16px;background:var(--danger-wash);border:1px solid var(--danger-soft);color:var(--danger);border-radius:var(--radius-sm);white-space:pre-wrap;font-size:12px;text-align:center}
 
 /* ---------- KPI cards ---------- */
-.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-top:18px}
-.kpi{position:relative;padding:18px 14px 15px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:transform .14s,box-shadow .14s;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.kpi{position:relative;padding:18px 14px 15px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:transform .14s,box-shadow .14s;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:98px}
 .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--muted-2))}
 .kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
 .kpi:active{transform:translateY(-1px)}
@@ -90,8 +90,10 @@ h1{margin:8px 0 6px;font-size:32px;font-weight:600;letter-spacing:-.02em}
 .kpi.total .label,.kpi.total .kpi-sub{color:rgba(255,255,255,.62)}
 .kpi.total .value{color:#fff}
 
-@media(max-width:1300px){.kpis{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.kpis{grid-template-columns:1fr}}
+
+.benchmark-warning{margin-top:10px;padding:6px 14px;border-radius:8px;background:var(--orange-deep);color:#fff;font-size:11px;font-weight:600;letter-spacing:.01em;text-align:center;line-height:1.4;box-shadow:var(--shadow-sm)}
 
 /* ---------- Panels / generic cards ---------- */
 .panel{padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}

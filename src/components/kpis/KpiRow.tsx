@@ -24,25 +24,33 @@ export default function KpiRow() {
     { key: 'effort-only', cls: 'effort', label: CLASSIFICATION_LABEL['effort-only'], value: counts['effort-only'], sub: 'Elevated effort' },
     { key: 'healthy', cls: 'healthy', label: CLASSIFICATION_LABEL.healthy, value: counts.healthy, sub: 'Within benchmark' },
     { key: 'no-utility', cls: 'undetermined', label: CLASSIFICATION_LABEL['no-utility'], value: counts['no-utility'], sub: 'No usage signal' },
-    { key: 'undetermined', cls: 'undetermined', label: CLASSIFICATION_LABEL.undetermined, value: counts.undetermined, sub: 'Missing benchmark data' },
     { key: 'total', cls: 'total', label: 'Total', value: rows.length, sub: 'In current view' },
   ];
 
+  const missingBenchmark = rows.some(
+    (r) => r.classification !== 'no-utility' && (r.puucDeviation == null || r.errDeviation == null)
+  );
+
   return (
-    <section className="kpis">
-      {cards.map((c) => (
-        <div
-          key={c.key}
-          className={`kpi ${c.cls}`}
-          onClick={() => openAccountPanel({ category: c.key, title: c.label })}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="label">{c.label}</div>
-          <div className="value">{c.value.toLocaleString()}</div>
-          <div className="kpi-sub">{c.sub}</div>
-        </div>
-      ))}
-    </section>
+    <>
+      <section className="kpis">
+        {cards.map((c) => (
+          <div
+            key={c.key}
+            className={`kpi ${c.cls}`}
+            onClick={() => openAccountPanel({ category: c.key, title: c.label })}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="label">{c.label}</div>
+            <div className="value">{c.value.toLocaleString()}</div>
+            <div className="kpi-sub">{c.sub}</div>
+          </div>
+        ))}
+      </section>
+      {missingBenchmark && (
+        <div className="benchmark-warning">Some institutions have insufficient Cost or Operational Effort benchmark data.</div>
+      )}
+    </>
   );
 }

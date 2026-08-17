@@ -5,10 +5,12 @@ import { CLASSIFICATION_LABEL } from '../../lib/quadrant';
 import { COLORS } from '../../lib/canonicalize';
 import type { Classification } from '../../types';
 
-const ORDER: Classification[] = ['both-high', 'cost-only', 'effort-only', 'healthy', 'undetermined', 'no-utility'];
+// Chart shows only the four evaluable classifications — No Utility and
+// Undetermined are excluded from the legend/plot by design.
+const ORDER: Classification[] = ['both-high', 'cost-only', 'effort-only', 'healthy'];
 
 const layout = (extra: Record<string, any> = {}) => ({
-  margin: { l: 56, r: 18, t: 16, b: 48 },
+  margin: { l: 56, r: 18, t: 44, b: 48 },
   font: { family: 'Inter,system-ui,sans-serif', size: 11, color: '#5c5648' },
   paper_bgcolor: 'rgba(0,0,0,0)',
   plot_bgcolor: 'rgba(0,0,0,0)',
@@ -48,7 +50,7 @@ export default function ScatterChart() {
             layout={layout({
               xaxis: { title: 'PUUC deviation vs vertical median', tickformat: '.0%', zeroline: true, gridcolor: '#EFE9DC' },
               yaxis: { title: 'PUUC (₹)', gridcolor: '#EFE9DC' },
-              legend: { orientation: 'h', y: 1.2, font: { size: 10 } },
+              legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.16, yanchor: 'bottom', font: { size: 10 } },
               showlegend: true,
             })}
             config={{ responsive: true, displaylogo: false }}

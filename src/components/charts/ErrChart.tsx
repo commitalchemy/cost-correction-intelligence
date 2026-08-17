@@ -5,10 +5,12 @@ import { COLORS } from '../../lib/canonicalize';
 import { CLASSIFICATION_LABEL } from '../../lib/quadrant';
 import type { Classification } from '../../types';
 
-const ORDER: Classification[] = ['both-high', 'cost-only', 'effort-only', 'healthy', 'undetermined', 'no-utility'];
+// Chart shows only the four evaluable classifications — No Utility and
+// Undetermined are excluded from the legend/plot by design.
+const ORDER: Classification[] = ['both-high', 'cost-only', 'effort-only', 'healthy'];
 
 const layout = (extra: Record<string, any> = {}) => ({
-  margin: { l: 48, r: 18, t: 16, b: 52 },
+  margin: { l: 48, r: 18, t: 44, b: 52 },
   font: { family: 'Inter,system-ui,sans-serif', size: 11, color: '#5c5648' },
   paper_bgcolor: 'rgba(0,0,0,0)',
   plot_bgcolor: 'rgba(0,0,0,0)',
@@ -51,7 +53,7 @@ export default function ErrChart() {
             barmode: 'stack',
             xaxis: { tickangle: -25 },
             yaxis: { title: 'Institutions', gridcolor: '#EFE9DC' },
-            legend: { orientation: 'h', y: 1.22, font: { size: 10 } },
+            legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.18, yanchor: 'bottom', font: { size: 10 } },
           })}
           config={{ responsive: true, displaylogo: false }}
           style={{ width: '100%', height: '100%' }}
