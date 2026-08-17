@@ -1,5 +1,3 @@
-b/src/lib/symlog.ts
-@@ -0,0 +1,60 @@
 /**
  * Manual symlog transform for use on Plotly axes.
  *
