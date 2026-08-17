@@ -62,8 +62,7 @@ export default function ExpensiveToServeChart() {
         {hiddenOutliers > 0 && (
           <>
             {' '}
-            View zoomed to −100%–300% deviation and up to 10× Infra Index; {hiddenOutliers.toLocaleString()} extreme outlier
-            {hiddenOutliers === 1 ? '' : 's'} outside this range (still included in the table and all counts).
+            View zoomed to −100% to 300% deviation.
           </>
         )}
       </div>
