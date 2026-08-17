@@ -71,10 +71,10 @@ export interface Row extends RawRow {
 
   // Expensive to Serve — separate lens, attached after classification.
   // Never read by benchmark.ts or quadrant.ts.
-  infraPctRevenue: number | null;
-  infraVerticalMedian: number | null;
-  infraIndex: number | null;
-  expensiveToServe: boolean;
+  infraPctRevenue?: number | null;
+  infraVerticalMedian?: number | null;
+  infraIndex?: number | null;
+  expensiveToServe?: boolean;
 }
 
 export interface ScoredRow extends Row {
