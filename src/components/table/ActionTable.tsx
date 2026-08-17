@@ -16,7 +16,12 @@ export default function ActionTable() {
   const rows = useFilteredRows();
   const openDrawer = useFilterStore((s) => s.openDrawer);
 
-  const ranked = [...rows].sort((a, b) => {
+  const TOP10_UTILITY_FLOOR = 50;
+ const LOW_UTILITY_CEILING = 100; // 50–100 tagged as "Low Utility" for context
+
+ const ranked = [...rows]
+   .filter((r) => r.utilityCount != null && r.utilityCount >= TOP10_UTILITY_FLOOR)
+   .sort((a, b) => {
     const ea = financialExposure(a) ?? -1;
     const eb = financialExposure(b) ?? -1;
     if (eb !== ea) return eb - ea;
@@ -29,6 +34,9 @@ export default function ActionTable() {
     <section className="panel" style={{ marginTop: 14 }}>
       <h2>Top 10 Institutions</h2>
       <div className="desc">Ranked by ₹ exposure above the recalculated benchmark, then priority score.</div>
+      <div className="desc" style={{ marginTop: -8 }}>
+    Eligible institutions have Utility Count ≥ {TOP10_UTILITY_FLOOR} to avoid tiny-denominator distortion.
+  </div>
       {top10.length === 0 ? (
         <div className="desc" style={{ padding: '24px 0', textAlign: 'center' }}>
           No institutions match the current filters.
@@ -51,7 +59,14 @@ export default function ActionTable() {
                 const exposure = financialExposure(r);
                 return (
                   <tr key={r.id} onClick={() => openDrawer(r)}>
-                    <td>{r.name}</td>
+                    <td>
+      {r.name}
+      {r.utilityCount != null && r.utilityCount < LOW_UTILITY_CEILING && (
+        <span className="badge neutral" style={{ marginLeft: 8, fontSize: 9, padding: '2px 8px' }}>
+          Low Utility
+        </span>
+      )}
+    </td>
                     <td>{r.vertical}</td>
                     <td>{exposure == null ? '—' : <b>{moneyCompact(exposure)}</b>}</td>
                     <td>{r.puucDeviation == null ? '—' : pct(r.puucDeviation)}</td>
