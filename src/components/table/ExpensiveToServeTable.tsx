@@ -18,8 +18,7 @@ export default function ExpensiveToServeTable() {
     <section className="panel" style={{ marginTop: 14 }}>
       <h2>Top 10 Expensive to Serve</h2>
       <div className="desc">
-        Ranked by Infra Cost Index (Infra Cost % Revenue ÷ vertical median), {EXPENSIVE_TO_SERVE_MULTIPLIER}× threshold. Separate
-        lens — does not change Cost/Effort classification or Top 10 Priority ranking.
+        Ranked by Infra Cost Index (Infra Cost % Revenue ÷ vertical median), {EXPENSIVE_TO_SERVE_MULTIPLIER}× threshold.
       </div>
       {top10.length === 0 ? (
         <div className="desc" style={{ padding: '24px 0', textAlign: 'center' }}>
