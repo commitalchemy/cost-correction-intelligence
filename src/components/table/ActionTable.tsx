@@ -1,42 +1,30 @@
 import { useFilteredRows } from '../../state/useFilteredRows';
 import { useFilterStore } from '../../state/filterStore';
-import { moneyCompact, pct, financialExposure } from '../../lib/metrics';
-import type { Classification } from '../../types';
-
-const RECOMMENDED_ACTION: Record<Classification, string> = {
-  'both-high': 'Investigate now: cost and effort are both elevated',
-  'cost-only': 'Review cost overrun; effort is not the driver',
-  'effort-only': 'Review effort load; cost is within range',
-  healthy: 'No action needed',
-  'no-utility': 'No usage signal — verify account status',
-  undetermined: 'Classification missing; cannot determine',
-};
+import { useCorrectionMap } from '../../state/useCorrectionMap';
+import { computeCorrection, CORRECTION_UTILITY_FLOOR } from '../../lib/correction';
 
 export default function ActionTable() {
   const rows = useFilteredRows();
   const openDrawer = useFilterStore((s) => s.openDrawer);
+  const stableMedianByVertical = useCorrectionMap();
 
-  const TOP10_UTILITY_FLOOR = 50;
- const LOW_UTILITY_CEILING = 100; // 50–100 tagged as "Low Utility" for context
-
- const ranked = [...rows]
-   .filter((r) => r.utilityCount != null && r.utilityCount >= TOP10_UTILITY_FLOOR)
-   .sort((a, b) => {
-    const ea = financialExposure(a) ?? -1;
-    const eb = financialExposure(b) ?? -1;
-    if (eb !== ea) return eb - ea;
-    return b.score - a.score;
-  });
+  // Rank by actual ₹ Revenue Gap (Section 9) — never by %. Only institutions
+  // with Utility Count >= floor and a valid (>=3 peer) vertical benchmark
+  // are eligible; institutions below the floor or in benchmark-sparse
+  // verticals are excluded rather than shown with a distorted figure.
+  const ranked = [...rows]
+    .map((r) => ({ row: r, correction: computeCorrection(r, stableMedianByVertical) }))
+    .filter((x) => x.correction.gap != null && x.correction.gap > 0)
+    .sort((a, b) => b.correction.gap! - a.correction.gap!);
 
   const top10 = ranked.slice(0, 10);
 
   return (
     <section className="panel" style={{ marginTop: 14 }}>
       <h2>Top 10 Institutions</h2>
-      <div className="desc">Ranked by ₹ exposure above the recalculated benchmark, then priority score.</div>
-      <div className="desc" style={{ marginTop: -8 }}>
-    Eligible institutions have Utility Count ≥ {TOP10_UTILITY_FLOOR} to avoid tiny-denominator distortion.
-  </div>
+      <div className="desc">
+        Ranked by ₹ Revenue Gap vs. vertical benchmark (Utility Count ≥ {CORRECTION_UTILITY_FLOOR}, benchmark requires 3+ comparable peers).
+      </div>
       {top10.length === 0 ? (
         <div className="desc" style={{ padding: '24px 0', textAlign: 'center' }}>
           No institutions match the current filters.
@@ -48,35 +36,21 @@ export default function ActionTable() {
               <tr>
                 <th>Institution</th>
                 <th>Vertical</th>
-                <th>₹ Exposure</th>
-                <th>PUUC Deviation</th>
-                <th>Priority</th>
-                <th>Recommended action</th>
+                <th>Utility Count</th>
+                <th>Correction Opportunity %</th>
               </tr>
             </thead>
             <tbody>
-              {top10.map((r) => {
-                const exposure = financialExposure(r);
-                return (
-                  <tr key={r.id} onClick={() => openDrawer(r)}>
-                    <td>
-      {r.name}
-      {r.utilityCount != null && r.utilityCount < LOW_UTILITY_CEILING && (
-        <span className="badge neutral" style={{ marginLeft: 8, fontSize: 9, padding: '2px 8px' }}>
-          Low Utility
-        </span>
-      )}
-    </td>
-                    <td>{r.vertical}</td>
-                    <td>{exposure == null ? '—' : <b>{moneyCompact(exposure)}</b>}</td>
-                    <td>{r.puucDeviation == null ? '—' : pct(r.puucDeviation)}</td>
-                    <td>
-                      <b>{Math.round(r.score * 100)}</b>
-                    </td>
-                    <td className="rec-action">{RECOMMENDED_ACTION[r.classification]}</td>
-                  </tr>
-                );
-              })}
+              {top10.map(({ row: r, correction }) => (
+                <tr key={r.id} onClick={() => openDrawer(r)}>
+                  <td>{r.name}</td>
+                  <td>{r.vertical}</td>
+                  <td>{r.utilityCount!.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                  <td>
+                    <b>{correction.pctOfIdeal == null ? '—' : `${correction.pctOfIdeal.toFixed(0)}%`}</b>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

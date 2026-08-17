@@ -1,12 +1,17 @@
 import { useFilterStore } from '../../state/filterStore';
+import { useCorrectionMap } from '../../state/useCorrectionMap';
 import { money, pct, costPerTicket, financialExposure } from '../../lib/metrics';
+import { computeCorrection, CORRECTION_UTILITY_FLOOR } from '../../lib/correction';
 import { CLASSIFICATION_DESC, CLASSIFICATION_LABEL } from '../../lib/quadrant';
 
 export default function DrawerPanel() {
   const row = useFilterStore((s) => s.selectedRow);
   const close = useFilterStore((s) => s.closeDrawer);
+  const stableMedianByVertical = useCorrectionMap();
 
   if (!row) return null;
+
+  const correction = computeCorrection(row, stableMedianByVertical);
 
   const cpt = costPerTicket(row);
   const comp = row.composition;
@@ -54,6 +59,21 @@ export default function DrawerPanel() {
           ['ERR', row.err == null ? '—' : row.err.toFixed(4)],
           ['Vertical ERR median', row.errMedian == null ? '—' : row.errMedian.toFixed(4)],
           ['ERR deviation', row.errDeviation == null ? '—' : pct(row.errDeviation)],
+        ].map(([label, value]) => (
+          <div className="metric" key={label as string}>
+            <span>{label}</span>
+            <b>{String(value)}</b>
+          </div>
+        ))}
+
+        <div className="subhead">Total Correction Opportunity (vs. benchmark)</div>
+        {[
+          ['Eligible for benchmark', row.utilityCount != null && row.utilityCount >= CORRECTION_UTILITY_FLOOR ? 'Yes' : `No — Utility Count below ${CORRECTION_UTILITY_FLOOR}`],
+          ['Vertical benchmark', correction.hasBenchmark ? 'Valid (3+ comparable peers)' : 'Insufficient Peer Benchmark'],
+          ['Ideal Commercial Value', money(correction.ideal)],
+          ['Actual Collections (Core Invoicing)', money(row.coreInvoicingFY26)],
+          ['Revenue Gap (₹)', money(correction.gap)],
+          ['Correction Opportunity %', correction.pctOfIdeal == null ? '—' : `${correction.pctOfIdeal.toFixed(1)}%`],
         ].map(([label, value]) => (
           <div className="metric" key={label as string}>
             <span>{label}</span>
